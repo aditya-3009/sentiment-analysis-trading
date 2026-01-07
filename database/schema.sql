@@ -45,3 +45,11 @@ CREATE TABLE IF NOT EXISTS text_features (
     has_financial_keyword BOOLEAN,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE TABLE IF NOT EXISTS data_quality_checks (
+    id SERIAL PRIMARY KEY,
+    preprocessed_text_id INT REFERENCES preprocessed_text(id),
+    is_empty BOOLEAN,
+    is_too_short BOOLEAN,
+    is_too_long BOOLEAN,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
