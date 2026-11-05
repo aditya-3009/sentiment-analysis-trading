@@ -1,4 +1,4 @@
-from app.services import sentiment
+from app.api import routes
 
 
 def test_health(client):
@@ -8,7 +8,7 @@ def test_health(client):
 
 
 def test_predict_persists_result(client, monkeypatch):
-    monkeypatch.setattr(sentiment, "predict_sentiment", lambda text: ("positive", 0.97))
+    monkeypatch.setattr(routes, "predict_sentiment", lambda text: ("positive", 0.97))
     response = client.post(
         "/predict",
         json={"text": "The company reported record quarterly revenue."},
