@@ -1,36 +1,30 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+"""FastAPI service for financial text sentiment analysis."""
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
-app = FastAPI(title="Sentiment Analysis Engine")
+from inference import predict_sentiment
 
-analyzer = SentimentIntensityAnalyzer()
+app = FastAPI(
+    title="Financial Sentiment Analysis API",
+    description="Financial text classification using ProsusAI FinBERT.",
+    version="1.0.0",
+)
 
 
 class SentimentRequest(BaseModel):
-    text: str
+    text: str = Field(min_length=1, max_length=4000)
 
 
-class SentimentResponse(BaseModel):
-    sentiment: str
-    score: float
+@app.get("/health")
+def health():
+    return {"status": "ok", "model": "ProsusAI/finbert", "model_loading": "lazy"}
 
 
-def label_sentiment(score: float) -> str:
-    if score >= 0.05:
-        return "positive"
-    elif score <= -0.05:
-        return "negative"
-    return "neutral"
-
-
-@app.post("/analyze", response_model=SentimentResponse)
+@app.post("/analyze")
 def analyze_sentiment(request: SentimentRequest):
-    scores = analyzer.polarity_scores(request.text)
-    compound = scores["compound"]
-    sentiment = label_sentiment(compound)
-
-    return SentimentResponse(
-        sentiment=sentiment,
-        score=compound
-    )
+    try:
+        return predict_sentiment(request.text)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
