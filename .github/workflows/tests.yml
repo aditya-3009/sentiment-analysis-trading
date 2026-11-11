@@ -18,6 +18,6 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install test dependencies
-        run: pip install fastapi pydantic pytest httpx
+        run: pip install fastapi pydantic pytest httpx "psycopg[binary]"
       - name: Run tests
         run: pytest -q
