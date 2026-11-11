@@ -1,7 +1,4 @@
-"""PostgreSQL connection helpers.
-
-Set the database settings through environment variables. Never commit credentials.
-"""
+"""PostgreSQL connection helpers. Credentials come from environment variables."""
 import os
 import psycopg
 from psycopg.rows import dict_row
@@ -13,7 +10,6 @@ DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
     "port": int(os.getenv("DB_PORT", "5432")),
 }
-
 
 def get_connection():
     if not DB_CONFIG["password"]:
